@@ -458,7 +458,9 @@ namespace WebDAV
     {
       pugi::xml_node href = response.node().select_node("*[local-name()='href']").node();
       std::string encode_file_name = href.first_child().value();
-      std::string resource_path = curl_unescape(encode_file_name.c_str(), static_cast<int>(encode_file_name.length()));
+      char* unescaped = curl_unescape(encode_file_name.c_str(), static_cast<int>(encode_file_name.length())); //this allocates new memory
+      std::string resource_path{unescaped}; // the data is copied
+      curl_free(unescaped);
       auto target_path = target_urn.path();
       auto target_path_without_sep = target_urn.path();
       if (!target_path_without_sep.empty() && target_path_without_sep.back() == '/')
